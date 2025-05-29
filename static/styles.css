@@ -1,5 +1,6 @@
 body {
-    background-color: rgb(239, 239, 210);
+    background-color: rgb(0, 0, 0);
+    color: white;
 }
 
 main {
@@ -12,5 +13,5 @@ main {
 
 img {
     border-radius: 8%;
-    border: 6px dashed black;
+    border: 6px dashed rgb(255, 255, 255);
 }
