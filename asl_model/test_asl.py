@@ -10,11 +10,11 @@ from sklearn.metrics import classification_report, confusion_matrix
 import datetime
 
 # === Constants ===
-DATASET_TEST = 'asl_alphabet_test'
+DATASET_TEST = 'asl_model/asl_alphabet_test'
 IMG_SIZE = 64
 BATCH_SIZE = 32
-MODEL_PATH = '../models/asl_model.keras'
-CLASS_INDEX_PATH = '../models/class_indices_asl.json'
+MODEL_PATH = './models/asl_model.keras'
+CLASS_INDEX_PATH = './models/class_indices_asl.json'
 
 # === Load class indices ===
 with open(CLASS_INDEX_PATH, 'r') as f:
