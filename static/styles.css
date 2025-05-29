@@ -1,0 +1,16 @@
+body {
+    background-color: rgb(239, 239, 210);
+}
+
+main {
+    height: 90vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+img {
+    border-radius: 8%;
+    border: 6px dashed black;
+}
