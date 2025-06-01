@@ -4,11 +4,14 @@
     <meta charset="UTF-8">
     <title>Silent Translator</title>
     <link rel="stylesheet" href="../static/styles.css">
+    <link rel="icon" href="../static/img/sign-language.png">
+    <script src="../static/js/switch.js" defer></script>
 </head>
 <body>
     <main>
         <h1>Silent Translator</h1>
         <img src="{{ url_for('video') }}" width="600">
+        <p id="modelType"></p>
     </main>
 </body>
 </html>

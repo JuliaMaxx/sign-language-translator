@@ -28,8 +28,8 @@ def validate_images_in_directory(directory):
 IMG_SIZE = 64 # small enough for fast training, big enough to capture detail
 BATCH_SIZE = 32 # processes 32 images per step — good balance for RAM and speed
 EPOCHS = 30 # one pass over all data = 1 epoch. 10 is enough to get good accuracy with ASL
-DATASET_TRAIN = '../data/asl_alphabet_train'
-MODEL_PATH = '../models/asl_model.keras'
+DATASET_TRAIN = './data/asl_alphabet_train'
+MODEL_PATH = './models/asl_model.keras'
 
 # Data generator
 datagen = ImageDataGenerator(
