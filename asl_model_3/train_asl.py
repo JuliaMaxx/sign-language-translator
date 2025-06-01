@@ -6,6 +6,9 @@ from tensorflow.keras.utils import to_categorical
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Dropout
 import json
+from sklearn.metrics import classification_report, confusion_matrix
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 DATASET_DIR = 'data/asl_data'
 
@@ -40,16 +43,21 @@ y_numbers = y[numbers_mask]
 # letters model
 le_letters = LabelEncoder()
 y_letters_encoded = to_categorical(le_letters.fit_transform(y_letters))
-X_train_l, X_val_l, y_train_l, y_val_l = train_test_split(
-    X_letters, y_letters_encoded, test_size=0.2, random_state=42
+X_train_l, X_temp_l, y_train_l, y_temp_l = train_test_split(
+    X_letters, y_letters_encoded, test_size=0.28, random_state=42
+)
+X_val_l, X_test_l, y_val_l, y_test_l = train_test_split(
+    X_temp_l, y_temp_l, test_size=0.3571, random_state=42  # 0.3571 * 0.28 ≈ 0.1
 )
 
 # Numbers model
 le_numbers = LabelEncoder()
 y_numbers_encoded = to_categorical(le_numbers.fit_transform(y_numbers))
-
-X_train_n, X_val_n, y_train_n, y_val_n = train_test_split(
-    X_numbers, y_numbers_encoded, test_size=0.2, random_state=42
+X_train_n, X_temp_n, y_train_n, y_temp_n = train_test_split(
+    X_numbers, y_numbers_encoded, test_size=0.28, random_state=42
+)
+X_val_n, X_test_n, y_val_n, y_test_n = train_test_split(
+    X_temp_n, y_temp_n, test_size=0.3571, random_state=42
 )
 
 def build_model(output_dim):
@@ -84,3 +92,36 @@ with open("models/class_indices_letters.json", "w") as f:
 # Numbers
 with open("models/class_indices_numbers.json", "w") as f:
     json.dump({i: c for i, c in enumerate(le_numbers.classes_)}, f)
+    
+    
+# ======== LETTERS MODEL TEST EVALUATION ========
+y_true_l = np.argmax(y_test_l, axis=1)
+y_pred_l = np.argmax(model_letters.predict(X_test_l), axis=1)
+print("=== LETTERS CLASSIFICATION REPORT ===")
+print(classification_report(y_true_l, y_pred_l, target_names=le_letters.classes_))
+
+conf_mat_l = confusion_matrix(y_true_l, y_pred_l)
+plt.figure(figsize=(10, 8))
+sns.heatmap(conf_mat_l, annot=True, fmt='d', xticklabels=le_letters.classes_, yticklabels=le_letters.classes_, cmap='Blues')
+plt.title("Letters Confusion Matrix")
+plt.xlabel("Predicted")
+plt.ylabel("True")
+plt.tight_layout()
+plt.savefig("asl_model_3/confusion_matrix_letters.png")
+plt.close()
+
+# ======== NUMBERS MODEL TEST EVALUATION ========
+y_true_n = np.argmax(y_test_n, axis=1)
+y_pred_n = np.argmax(model_numbers.predict(X_test_n), axis=1)
+print("=== NUMBERS CLASSIFICATION REPORT ===")
+print(classification_report(y_true_n, y_pred_n, target_names=le_numbers.classes_))
+
+conf_mat_n = confusion_matrix(y_true_n, y_pred_n)
+plt.figure(figsize=(6, 5))
+sns.heatmap(conf_mat_n, annot=True, fmt='d', xticklabels=le_numbers.classes_, yticklabels=le_numbers.classes_, cmap='Greens')
+plt.title("Numbers Confusion Matrix")
+plt.xlabel("Predicted")
+plt.ylabel("True")
+plt.tight_layout()
+plt.savefig("asl_model_3/confusion_matrix_numbers.png")
+plt.close()
