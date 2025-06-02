@@ -1,15 +1,19 @@
-let modelTypeSpan = document.getElementById('modelType');
+let modelTypeBtn = document.getElementById('modelType');
+let clearBtn = document.getElementById('clear');
 
-fetch('/model')
-      .then(res => res.json())
-      .then(data => modelTypeSpan.textContent = `${data.model} mode`);
-
-    document.addEventListener('keydown', function(event) {
-    if (event.key === 'n') {
-        fetch('/switch', { method: 'POST' })
-        .then(res => res.json())
-        .then(data => {
-            modelTypeSpan.textContent = `${data.model} mode`;
-        });
-    }
+modelTypeBtn.addEventListener('click', () => {
+    fetch('/switch', { method: 'POST' })
+    .then(res => res.json())
+    .then(data => {
+        if (data.model == 'letters'){
+            modelTypeBtn.textContent = "Numbers"
+        } else {
+            modelTypeBtn.textContent = "Letters"
+        }
     });
+});
+
+clearBtn.addEventListener('click', () => {
+    fetch('/clear', {method: 'POST'})
+    .then(res => res.json())
+})
