@@ -59,7 +59,7 @@ def generate_frames():
         rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         results = hands.process(rgb)
         # Create a black background frame same size as camera frame
-        black_frame = np.zeros_like(frame)
+        black_frame = np.full_like(frame, fill_value=(86, 86, 91))
 
         if results.multi_hand_landmarks:
             for hand_landmarks in results.multi_hand_landmarks:
@@ -68,8 +68,8 @@ def generate_frames():
                     black_frame,
                     hand_landmarks,
                     mp_hands.HAND_CONNECTIONS,
-                    mp_drawing.DrawingSpec(color=(0, 255, 0), thickness=5, circle_radius=2),
-                    mp_drawing.DrawingSpec(color=(255, 0, 255), thickness=3)
+                    mp_drawing.DrawingSpec(color=(237, 228, 228), thickness=5, circle_radius=2),
+                    mp_drawing.DrawingSpec(color=(188, 188, 200), thickness=3)
                 )
                 
                 try:

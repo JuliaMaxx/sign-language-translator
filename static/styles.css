@@ -5,10 +5,18 @@
     font-style: normal;
 }
 
+:root {
+    --background: rgb(91, 86, 86);
+    --primary: rgb(211, 203, 203);
+    --accent: rgb(255, 0, 255);
+}
+
 body {
-    background-color: rgb(0, 0, 0);
-    color: white;
+    background-color: var(--background);
+    color: var(--primary);
     font-size: 15px;
+    display: flex;
+    flex-direction: column;
 }
 
 h1 {
@@ -18,7 +26,7 @@ h1 {
 }
 
 main {
-    height: 90vh;
+    flex: 1;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -27,7 +35,7 @@ main {
 
 img {
     border-radius: 8%;
-    border: 6px dashed rgb(255, 255, 255);
+    box-shadow: 0.1rem 0.2rem 0.3rem 0.1rem rgba(0, 0, 0, 0.43);
 }
 
 p {
@@ -37,10 +45,25 @@ p {
 }
 
 footer {
+    height: 12vh;
     text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
 }
 
-span {
-    color:rgb(255, 0, 255);
+footer > button {
+    color: var(--primary);
+    background-color: var(--background);
+    border: 0.1rem solid var(--primary);
+    padding: 0.5rem 1.5rem;
+    border-radius: 1rem;
+    font-size: 1rem;
     font-weight: bold;
+    transition: all 0.1s;
+}
+
+footer > button:hover {
+    transform: scale(1.08)
 }
