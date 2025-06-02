@@ -5,6 +5,8 @@ import numpy as np
 from keras.models import load_model
 import json
 import threading
+from collections import deque, Counter
+from textblob import TextBlob
 
 app = Flask(__name__)
 
@@ -37,6 +39,10 @@ def extract_landmarks(hand_landmarks):
     return np.array([coord for lm in hand_landmarks.landmark for coord in (lm.x, lm.y, lm.z)])
 
 def generate_frames():
+    prediction_buffer = deque(maxlen=15)
+    last_prediction = None
+    sentence = ""
+    
     while True:
         success, frame = camera.read()
         if not success:
@@ -72,6 +78,19 @@ def generate_frames():
                     cv2.putText(black_frame, f"{predicted_class}", (10, 70),
                                 cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 4)
 
+                    predicted_index = np.argmax(prediction)
+                    predicted_char = model_state["index_map"][predicted_index]
+                    
+                    # wait for model to be certain withthe letter
+                    prediction_buffer.append(predicted_char)
+                    buffer_counts = Counter(prediction_buffer)
+                    most_common, count = buffer_counts.most_common(1)[0]
+                    if count >= 6 and most_common != last_prediction:
+                        sentence += most_common
+                        print(sentence)
+                        last_prediction = most_common
+                        prediction_buffer.clear()
+                            
                 except Exception as e:
                     print("Prediction failed:", e)
                         
