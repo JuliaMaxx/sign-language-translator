@@ -45,6 +45,7 @@ def correct_and_segment(text):
     return suggestions.corrected_string
 
 def generate_frames():
+    global sentence
     prediction_buffer = deque(maxlen=15)
     last_prediction = None
     sentence = ""
@@ -128,6 +129,12 @@ def switch():
         model_state["type"] = "letters"
     print(f"[MODEL] Switched to {model_state['type'].upper()}")
     return jsonify({"status": "ok", "model": model_state["type"]})
+
+@app.route('/clear', methods=['POST'])
+def clear():
+    global sentence
+    sentence = ""
+    return jsonify({"status": "ok"})
 
 @app.route('/model')
 def model_info():
