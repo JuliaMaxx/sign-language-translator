@@ -6,7 +6,9 @@ from keras.models import load_model
 import json
 import threading
 from collections import deque, Counter
-from textblob import TextBlob
+from symspellpy import SymSpell, Verbosity
+sym_spell = SymSpell(max_dictionary_edit_distance=2, prefix_length=7)
+sym_spell.load_dictionary("frequency_dictionary_en_82_765.txt", term_index=0, count_index=1)
 
 app = Flask(__name__)
 
@@ -37,6 +39,10 @@ mp_drawing = mp.solutions.drawing_utils
                
 def extract_landmarks(hand_landmarks):
     return np.array([coord for lm in hand_landmarks.landmark for coord in (lm.x, lm.y, lm.z)])
+
+def correct_and_segment(text):
+    suggestions = sym_spell.word_segmentation(text)
+    return suggestions.corrected_string
 
 def generate_frames():
     prediction_buffer = deque(maxlen=15)
@@ -87,9 +93,10 @@ def generate_frames():
                     most_common, count = buffer_counts.most_common(1)[0]
                     if count >= 6 and most_common != last_prediction:
                         sentence += most_common
-                        print(sentence)
                         last_prediction = most_common
                         prediction_buffer.clear()
+                        corrected = correct_and_segment(sentence)
+                        print("Refined:", corrected)
                             
                 except Exception as e:
                     print("Prediction failed:", e)

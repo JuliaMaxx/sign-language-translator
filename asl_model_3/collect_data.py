@@ -6,7 +6,7 @@ from datetime import datetime
 
 # === Settings ===
 SAVE_DIR = "data/asl_data"
-NUM_SAMPLES = 2000
+NUM_SAMPLES = 4000
 DETECTION_CONFIDENCE = 0.8
 
 # === Initialize MediaPipe Hands ===
