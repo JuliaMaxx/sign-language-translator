@@ -1,17 +1,41 @@
-from flask import Flask, render_template, Response, request, jsonify
+from fastapi import FastAPI, Request
+from fastapi.responses import StreamingResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
 import cv2
 import mediapipe as mp
 import numpy as np
 from keras.models import load_model
 import json
-import threading
 from collections import deque, Counter
-from symspellpy import SymSpell, Verbosity
+from symspellpy import SymSpell
+from starlette.templating import Jinja2Templates
+import socketio
+import threading
+import asyncio
+import uvicorn
+
+# Spelling
 sym_spell = SymSpell(max_dictionary_edit_distance=2, prefix_length=7)
 sym_spell.load_dictionary("frequency_dictionary_en_82_765.txt", term_index=0, count_index=1)
 
-app = Flask(__name__)
+# App and socket.io server
+sio = socketio.AsyncServer(async_mode='asgi')
 
+fastapi_app = FastAPI()
+fastapi_app.mount("/static", StaticFiles(directory="static"), name="static")
+templates = Jinja2Templates(directory="templates")
+
+app = socketio.ASGIApp(sio, fastapi_app)
+
+main_loop = asyncio.new_event_loop()
+asyncio.set_event_loop(main_loop)
+
+# Globals
+camera = cv2.VideoCapture(0)
+frame_lock = threading.Lock()
+prediction_buffer = deque(maxlen=15)
+
+# Models
 model_letters = load_model('models/asl_letters.keras')
 model_numbers = load_model('models/asl_numbers.keras')
 
@@ -29,8 +53,6 @@ model_state = {
     "type": "letters"
 }
 
-camera = cv2.VideoCapture(0)
-
 mp_hands = mp.solutions.hands
 hands = mp_hands.Hands(static_image_mode=False,
                        max_num_hands=1,
@@ -43,6 +65,9 @@ def extract_landmarks(hand_landmarks):
 def correct_and_segment(text):
     suggestions = sym_spell.word_segmentation(text)
     return suggestions.corrected_string
+
+# Get main loop
+main_loop = asyncio.get_event_loop()
 
 def generate_frames():
     global sentence
@@ -98,6 +123,12 @@ def generate_frames():
                         prediction_buffer.clear()
                         corrected = correct_and_segment(sentence)
                         print("Refined:", corrected)
+                        
+                        # Run emit on the main loop
+                        asyncio.run_coroutine_threadsafe(
+                            sio.emit('update_text', {'text': corrected}),
+                            main_loop
+                        )
                             
                 except Exception as e:
                     print("Prediction failed:", e)
@@ -107,16 +138,16 @@ def generate_frames():
 
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
-@app.route('/')
-def index():
-    return render_template('index.html')
+        
+@fastapi_app.get('/')
+async def get_index(request: Request):
+    return templates.TemplateResponse('index.html', {"request": request})
 
-@app.route('/video')
+@fastapi_app.get('/video')
 def video():
-    return Response(generate_frames(),
-                    mimetype='multipart/x-mixed-replace; boundary=frame')
+    return StreamingResponse(generate_frames(), media_type='multipart/x-mixed-replace; boundary=frame')
     
-@app.route('/switch', methods=['POST'])
+@fastapi_app.post('/switch')
 def switch():
     global model_state
     if model_state["type"] == "letters":
@@ -128,17 +159,17 @@ def switch():
         model_state["index_map"] = index_to_class_letters
         model_state["type"] = "letters"
     print(f"[MODEL] Switched to {model_state['type'].upper()}")
-    return jsonify({"status": "ok", "model": model_state["type"]})
+    return JSONResponse({"status": "ok", "model": model_state["type"]})
 
-@app.route('/clear', methods=['POST'])
+@fastapi_app.post('/clear')
 def clear():
     global sentence
     sentence = ""
-    return jsonify({"status": "ok"})
+    return JSONResponse({"status": "ok"})
 
-@app.route('/model')
+@fastapi_app.get('/model')
 def model_info():
-    return jsonify({"model": model_state["type"]})
-    
-if __name__ == '__main__':
-    app.run(debug=True)
+    return JSONResponse({"model": model_state["type"]})
+
+if __name__ == "__main__":
+    uvicorn.run("app:app", host="0.0.0.0", port=8000, reload=False)
