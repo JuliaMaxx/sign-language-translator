@@ -3,6 +3,7 @@
     src: url('./Signfont-Regular.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
+    font-family: sans-serif;
 }
 
 :root {
@@ -12,40 +13,44 @@
 }
 
 body {
+    height: 97vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     background-color: var(--background);
     color: var(--primary);
     font-size: 15px;
-    display: flex;
-    flex-direction: column;
 }
 
 h1 {
     font-family: 'Signfont';
     font-size: 3rem;
     font-weight: 100;
+    margin: 0;
+    padding: 0;
 }
 
 main {
-    flex: 1;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    gap: 2rem;
 }
 
 img {
     border-radius: 8%;
+    height: 60%;
+    max-height: 400px;
     box-shadow: 0.1rem 0.2rem 0.3rem 0.1rem rgba(0, 0, 0, 0.43);
 }
 
-p {
-    font-family: sans-serif;
-    font-weight: 600;
+p, #text {
     font-size: 1.5rem;
+    font-weight: 600;
 }
 
-footer {
-    height: 12vh;
+.buttons {
     text-align: center;
     display: flex;
     justify-content: center;
@@ -53,7 +58,7 @@ footer {
     gap: 1rem;
 }
 
-footer > button {
+.buttons > button {
     color: var(--primary);
     background-color: var(--background);
     border: 0.1rem solid var(--primary);
@@ -64,6 +69,16 @@ footer > button {
     transition: all 0.1s;
 }
 
-footer > button:hover {
+.buttons > button:hover {
     transform: scale(1.08)
+}
+
+#text {
+    font-size: 1.1rem;
+    font-family: sans-serif;
+    padding: 0.5rem 1.5rem;
+    border-radius: 1.9rem;
+    box-shadow: 0.1rem 0.2rem 0.3rem 0.1rem rgba(0, 0, 0, 0.43);
+    width: 35vw;
+    text-align: center;
 }

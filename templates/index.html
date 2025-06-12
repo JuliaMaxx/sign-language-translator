@@ -5,15 +5,15 @@
     <title>Silent Translator</title>
     <link rel="stylesheet" href="../static/styles.css">
     <link rel="icon" href="../static/img/sign-language.png">
-    <script src="../static/js/switch.js" defer></script>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js" crossorigin="anonymous"></script>
+    <script src="../static/js/index.js" defer></script>
 </head>
 <body>
     <main>
         <h1>Silent Translator</h1>
-        <img src="{{ url_for('video') }}" width="600">
+        <img src="{{ url_for('video') }}">
+        <div id="text">Start signing :)</div>
+        <div class="buttons"><button id="modelChange">BSL</button><button id="modelType">Numbers</button><button id="clear">Clear</button></div>
     </main>
-    <footer>
-        <button id="modelChange">BSL</button><button id="modelType">Numbers</button><button id="clear">Clear</button>
-    </footer>
 </body>
 </html>
