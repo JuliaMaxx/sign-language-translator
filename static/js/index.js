@@ -17,7 +17,7 @@ modelTypeBtn.addEventListener('click', () => {
 });
 
 clearBtn.addEventListener('click', () => {
-    textDiv.innerText = "Start signing :)";
+    textDiv.innerText = "Start signing...";
     fetch('/clear', {method: 'POST'})
     .then(res => res.json())
 });

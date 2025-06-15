@@ -80,5 +80,5 @@ p, #text {
     border-radius: 1.9rem;
     box-shadow: 0.1rem 0.2rem 0.3rem 0.1rem rgba(0, 0, 0, 0.43);
     width: 35vw;
-    text-align: center;
+    /* text-align: center; */
 }
