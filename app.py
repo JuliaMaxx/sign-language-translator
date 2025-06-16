@@ -41,7 +41,7 @@ model_asl_numbers = load_model('models/asl_numbers.keras')
 model_bsl_letters = load_model('models/bsl_letters.keras')
 model_bsl_numbers = load_model('models/bsl_numbers.keras')
 
-with open('models/class_indices_asl__letters.json') as f:
+with open('models/class_indices_asl_letters.json') as f:
     class_indices_asl_letters = json.load(f)
 with open('models/class_indices_asl_numbers.json') as f:
     class_indices_asl_numbers = json.load(f)
