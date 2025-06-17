@@ -61,7 +61,8 @@ model_state = {
     "model": model_asl_letters,
     "index_map": index_to_class_asl_letters,
     "type": "letters",
-    "language": 'asl'
+    "language": 'asl',
+    "input_size": 63
 }
 
 mp_hands = mp.solutions.hands
@@ -70,7 +71,7 @@ hands = mp_hands.Hands(static_image_mode=False,
                        min_detection_confidence=0.7)
 mp_drawing = mp.solutions.drawing_utils
                
-def extract_combined_landmarks(results):
+def extract_two_hand_landmarks(results):
     hand_landmarks = results.multi_hand_landmarks or []
     all_hand_data = []
 
@@ -88,6 +89,12 @@ def extract_combined_landmarks(results):
     else:
         return None
 
+def extract_single_hand_landmarks(results):
+    if results.multi_hand_landmarks:
+        landmarks = results.multi_hand_landmarks[0]
+        return np.array([coord for lm in landmarks.landmark for coord in (lm.x, lm.y, lm.z)])
+    return None
+
 def correct_and_segment(text):
     suggestions = sym_spell.word_segmentation(text)
     return suggestions.corrected_string
@@ -98,9 +105,11 @@ def update_model():
     if lang == 'asl':
         model_state["model"] = model_asl_letters if typ == "letters" else model_asl_numbers
         model_state["index_map"] = index_to_class_asl_letters if typ == "letters" else index_to_class_asl_numbers
+        model_state["input_size"] = 63
     else:
         model_state["model"] = model_bsl_letters if typ == "letters" else model_bsl_numbers
         model_state["index_map"] = index_to_class_bsl_letters if typ == "letters" else index_to_class_bsl_numbers
+        model_state["input_size"] = 126
 
 # Get main loop
 main_loop = asyncio.get_event_loop()
@@ -134,7 +143,10 @@ def generate_frames():
                 )
 
             try:
-                landmarks = extract_combined_landmarks(results)
+                if model_state["input_size"] == 63:
+                    landmarks = extract_single_hand_landmarks(results)
+                else:
+                    landmarks = extract_two_hand_landmarks(results)
                 if landmarks is None:
                     continue
 
